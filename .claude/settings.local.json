@@ -2,17 +2,9 @@
   "permissions": {
     "allow": [
       "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude/**)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude/**)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude\\hooks/**)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude\\hooks/**)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude\\hooks/**)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git init:*)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude\\hooks/**)",
-      "Bash(bash:*)",
-      "Bash(find:*)",
-      "Read(/C:\\Users\\User\\OneDrive\\Desktop\\Github\\deskstop app\\.claude\\hooks/**)"
+      "Bash(gh:*)",
+      "Bash(chmod:*)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": []

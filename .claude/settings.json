@@ -1,128 +1,136 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)",
+      "Read",
+      "Edit", 
+      "MultiEdit",
+      "Write",
+      "Glob",
+      "Grep",
+      "LS",
+      "Task",
+      "WebFetch",
+      "WebSearch",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
       "Bash(ls:*)",
-      "Bash(source:*)",
-      "Bash(find:*)",
-      "Bash(mv:*)",
-      "Bash(mkdir:*)",
-      "Bash(tree:*)",
-      "Bash(ruff:*)",
-      "Bash(touch:*)",
       "Bash(cat:*)",
-      "Bash(ruff check:*)",
-      "Bash(pytest:*)",
+      "Bash(pwd:*)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(docker:*)",
       "Bash(python:*)",
-      "Bash(python -m pytest:*)",
-      "Bash(python3 -m pytest:*)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:github.com)"
+      "Bash(node:*)",
+      "Bash(pip:*)"
     ],
-    "deny": []
-  }
-}
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./config/credentials.json)"
+    ]
+  },
 
-{
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "^(Write|Edit|MultiEdit)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-code-change.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "^Bash$",
-        "hooks": [
-          {
-            "type": "command", 
-            "command": "echo '⚡ Running bash command...' && echo 'Command: $CLAUDE_TOOL_ARGS' >> .claude/bash-history.log"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
-        "matcher": "^(Write|Edit|MultiEdit)$",
+        "matcher": "Write(*.js)|Write(*.ts)|Write(*.jsx)|Write(*.tsx)",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-code-change.sh"
+            "command": ".claude/hooks/format-code.sh $file",
+            "timeout": 30
           }
         ]
       },
       {
-        "matcher": "^(Bash.*build|Bash.*cargo tauri build)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-build.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "^(Bash.*test|Bash.*npm test|Bash.*cargo test)$",
+        "matcher": "Write(package.json)",
         "hooks": [
           {
             "type": "command", 
-            "command": "echo '🧪 Tests completed - generating report...' && echo 'Test run: $(date)' >> .claude/test-history.log"
-          }
-        ]
-      }
-    ],
-    "UserSubmitPrompt": [
-      {
-        "matcher": ".*commit.*|.*push.*|.*merge.*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/git-operation.sh"
+            "command": ".claude/hooks/check-deps.sh",
+            "timeout": 60
           }
         ]
       },
       {
-        "matcher": ".*build.*|.*deploy.*|.*release.*",
+        "matcher": "Write(src/**/*.test.*)|Write(tests/**/*)",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-build.sh"
+            "command": ".claude/hooks/run-tests.sh $file",
+            "timeout": 120
           }
         ]
       }
     ],
-    "SessionStart": [
+    
+    "PreToolUse": [
       {
-        "matcher": ".*",
+        "matcher": "Bash(git commit *)",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+            "command": ".claude/hooks/git-workflow.sh protect-main",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-commit-check.sh",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git push *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/git-workflow.sh suggest-pr",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-cleanup.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/log-session.sh",
+            "timeout": 5
           }
         ]
       }
     ]
   },
-  "project_context": {
-    "name": "CreativeKit Desktop",
-    "type": "tauri-app",
-    "languages": ["typescript", "rust", "python"],
-    "frameworks": ["react", "tauri", "fastapi"],
-    "commands": {
-      "dev": "cargo tauri dev",
-      "build": "cargo tauri build", 
-      "test": "npm test && cd src-tauri && cargo test",
-      "lint": "npm run lint && cd src-tauri && cargo clippy",
-      "format": "npm run format && cd src-tauri && cargo fmt"
-    }
-  },
-  "validation_rules": {
-    "max_file_size": "500_lines",
-    "required_tests": true,
-    "code_review": true,
-    "security_check": true
+
+  "environment": {
+    "NODE_ENV": "development",
+    "FORCE_COLOR": "1"
   }
+
 }
+
