@@ -1,0 +1,9 @@
+{
+  "name": "hook-test-project",
+  "version": "1.0.0",
+  "description": "Test project for Claude Code hooks",
+  "scripts": {
+    "lint": "echo 'Linting...'",
+    "lint:quick": "echo 'Quick lint check'"
+  }
+}
