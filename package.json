@@ -1,9 +1,11 @@
 {
   "name": "hook-test-project",
   "version": "1.0.0",
-  "description": "Test project for Claude Code hooks",
+  "description": "Test project for Claude Code hooks - updated to test dependency check hook",
   "scripts": {
     "lint": "echo 'Linting...'",
-    "lint:quick": "echo 'Quick lint check'"
+    "lint:quick": "echo 'Quick lint check'",
+    "typecheck": "echo 'TypeScript checking...'",
+    "test": "echo 'Running tests...'"
   }
 }
